@@ -5,6 +5,7 @@ import { useAppDispatch } from "../app/hook";
 import { addRecording } from "../features/recording/recordingThunk";
 import AudioPlayer from "./AudioPlayer";
 import { useMessenger } from "../useMessenger";
+import { motion, AnimatePresence } from "motion/react";
 
 function RecorderComponent() {
   const dispatch = useAppDispatch();
@@ -77,50 +78,66 @@ function RecorderComponent() {
   return (
     <div className="space-y-4 ">
       {recordedBlob ? (
-        <AudioPlayer
-          recording={{
-            id: -12,
-            name: name,
-            blob: recordedBlob,
-            duration: duration,
-            timestamp: new Date(),
-          }}
-          editable={true}
-          onNameEdit={(name: string) => setName(name)}
-          handleSave={handleSave}
-          handleDiscard={handleDiscard}
-        />
-      ) : (
-        <>
-          {!hide && (
-            <h1 className="text-5xl font-bold mb-8 text-[#30cfd0]">
-              Start Recording
-            </h1>
-          )}
-          <p className="text-white font-bold text-3xl">
-            {startTimer ? formatTime(elapsedTime) : "00:00"}
-          </p>
-          <AudioRecorder
-            onStart={() => {
-              setStartTimer(true);
-              setHide(true);
-            }}
-            onStop={handleStopRecording}
-            className={`background p-2 text-white overflow-hidden rounded-full p-4 h-30 aspect-square flex items-center justify-center shadow-md flex items-center mx-auto relative ${
-              startTimer ? "background-2" : "background"
-            }`}
-            visualizer={canvasRef}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key="recorded"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <Mic
-              className={`${startTimer ? "text-red-500 " : "text-white"}`}
-              size={32}
+            <AudioPlayer
+              recording={{
+                id: -12,
+                name: name,
+                blob: recordedBlob,
+                duration: duration,
+                timestamp: new Date(),
+              }}
+              editable={true}
+              onNameEdit={(name: string) => setName(name)}
+              handleSave={handleSave}
+              handleDiscard={handleDiscard}
             />
-            <canvas
-              ref={canvasRef}
-              className="inset-0 h-full w-full mb-4 mx-auto absolute"
-            />
-          </AudioRecorder>
-        </>
+          </motion.div>
+        </AnimatePresence>
+      ) : (
+        <AnimatePresence>
+          <motion.div
+            key="recording"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {!hide && (
+              <h1 className="text-5xl font-bold mb-8 text-[#30cfd0]">
+                Start Recording
+              </h1>
+            )}
+            <p className="text-white font-bold text-3xl">
+              {startTimer ? formatTime(elapsedTime) : "00:00"}
+            </p>
+            <AudioRecorder
+              onStart={() => {
+                setStartTimer(true);
+                setHide(true);
+              }}
+              onStop={handleStopRecording}
+              className={`background p-2 text-white overflow-hidden rounded-full p-4 h-30 aspect-square flex items-center justify-center shadow-md flex items-center mx-auto relative ${
+                startTimer ? "background-2" : "background"
+              }`}
+              visualizer={canvasRef}
+            >
+              <Mic
+                className={`${startTimer ? "text-red-500 " : "text-white"}`}
+                size={32}
+              />
+              <canvas
+                ref={canvasRef}
+                className="inset-0 h-full w-full mb-4 mx-auto absolute"
+              />
+            </AudioRecorder>
+          </motion.div>
+        </AnimatePresence>
       )}
     </div>
   );
