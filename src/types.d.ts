@@ -1,7 +1,7 @@
 interface RecordingType {
   blob: Blob;
   name: string;
-  timeStamp?: Date;
+  timestamp?: Date;
   duration: number;
 }
 

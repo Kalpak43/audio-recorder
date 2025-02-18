@@ -119,7 +119,7 @@ function AudioRecorder({
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = "#00f";
+      ctx.strokeStyle = "#fff";
       ctx.beginPath();
 
       const sliceWidth = canvas.width / dataArrayRef.current.length;
@@ -221,7 +221,6 @@ function AudioRecorder({
       onClick={isRecording ? stopRecording : startRecording}
     >
       {children}
-      {isRecording ? "Stop Recording" : "Start Recording"}
     </button>
   );
 }

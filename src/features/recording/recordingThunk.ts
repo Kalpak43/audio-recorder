@@ -27,19 +27,20 @@ export const addRecording = createAsyncThunk(
     blob: Blob;
     duration: number;
   }) => {
-    const recordingName = name ?? new Date().toLocaleString();
+    const recordingName = name ?? "REC: " + new Date().toLocaleString();
     const id = await saveRecording({
       name: recordingName,
       blob: blob,
       duration: duration,
     });
+
     return {
       id,
       name: recordingName,
       blob,
       timestamp: Date.now(),
       duration: duration,
-    } as RecordingWithId;
+    } as unknown as RecordingWithId;
   }
 );
 
