@@ -8,7 +8,7 @@ function AudioRecorder({
 }: {
   className?: string;
   onStart: () => void;
-  onStop: (url: string) => void;
+  onStop: (recordedBlob: Blob) => void;
   visualizer?: RefObject<HTMLCanvasElement | null>;
 }) {
   const [isRecording, setIsRecording] = useState(false);
@@ -60,8 +60,7 @@ function AudioRecorder({
           type: "audio/wav",
         });
 
-        const wavUrl = URL.createObjectURL(audioBlob);
-        onStop(wavUrl);
+        onStop(audioBlob);
         audioChunksRef.current = []; // Clear chunks
       };
 
@@ -77,7 +76,12 @@ function AudioRecorder({
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
-    cancelAnimationFrame(animationFrameRef.current!);
+    if (analyser && visualizer) {
+      cancelAnimationFrame(animationFrameRef.current!);
+      const canvas = visualizer.current;
+      const ctx = canvas!.getContext("2d");
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+    }
   }
 
   function drawWaveform() {
@@ -128,15 +132,81 @@ function AudioRecorder({
     draw();
   }
 
+  const drawCircularWaveform = () => {
+    if (
+      (visualizer && !visualizer.current) ||
+      (analyser && !analyser.current) ||
+      !dataArrayRef.current
+    ) {
+      return;
+    }
+
+    const canvas = visualizer!.current!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const draw = () => {
+      if ((analyser && !analyser.current) || !dataArrayRef.current) return;
+
+      analyser && analyser!.current!.getByteFrequencyData(dataArrayRef.current);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(centerX, centerY) - 10;
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
+      ctx.stroke();
+
+      for (let i = 0; i < dataArrayRef.current.length; i++) {
+        const angle = (i / dataArrayRef.current.length) * 2 * Math.PI;
+        const amplitude = dataArrayRef.current[i] / 255;
+        const x = centerX + radius * Math.cos(angle) * (1 + amplitude * 0.3);
+        const y = centerY + radius * Math.sin(angle) * (1 + amplitude * 0.3);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 2 + amplitude * 5, 0, 2 * Math.PI);
+        ctx.fillStyle = `hsl(${
+          (i * 360) / dataArrayRef.current.length
+        }, 100%, 50%)`;
+        ctx.fill();
+
+        if (i > 0) {
+          const prevAngle =
+            ((i - 1) / dataArrayRef.current.length) * 2 * Math.PI;
+          const prevAmplitude = dataArrayRef.current[i - 1] / 255;
+          const prevX =
+            centerX + radius * Math.cos(prevAngle) * (1 + prevAmplitude * 0.3);
+          const prevY =
+            centerY + radius * Math.sin(prevAngle) * (1 + prevAmplitude * 0.3);
+
+          ctx.beginPath();
+          ctx.moveTo(prevX, prevY);
+          ctx.lineTo(x, y);
+          ctx.strokeStyle = `hsla(${
+            (i * 360) / dataArrayRef.current.length
+          }, 100%, 50%, 0.5)`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      }
+
+      animationFrameRef.current = requestAnimationFrame(draw);
+    };
+
+    draw();
+  };
+
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <button
-        className={`cursor-pointer ${className}`}
-        onClick={isRecording ? stopRecording : startRecording}
-      >
-        {isRecording ? "Stop Recording" : "Start Recording"}
-      </button>
-    </div>
+    <button
+      className={`cursor-pointer ${className}`}
+      onClick={isRecording ? stopRecording : startRecording}
+    >
+      {isRecording ? "Stop Recording" : "Start Recording"}
+    </button>
   );
 }
 

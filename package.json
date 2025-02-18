@@ -13,9 +13,12 @@
     "@breezystack/lamejs": "^1.2.7",
     "@ffmpeg/core": "^0.12.10",
     "@ffmpeg/ffmpeg": "^0.12.15",
+    "@reduxjs/toolkit": "^2.5.1",
     "@tailwindcss/vite": "^4.0.6",
+    "idb": "^8.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
     "tailwindcss": "^4.0.6"
   },
   "devDependencies": {
