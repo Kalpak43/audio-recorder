@@ -1,23 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import AudioRecorder from "./components/AudioRecorder";
-import { useAppDispatch, useAppSelector } from "./app/hook";
-import {
-  addRecording,
-  fetchRecordings,
-} from "./features/recording/recordingThunk";
+import { useAppDispatch } from "./app/hook";
+import { addRecording } from "./features/recording/recordingThunk";
+import RecordingsList from "./components/RecordingsList";
 
 function App() {
   const dispatch = useAppDispatch();
-  const recordings = useAppSelector((state) => state.recordings.list);
-
-  useEffect(() => {
-    dispatch(fetchRecordings());
-  }, [dispatch]);
-
-  useEffect(() => {
-    console.log(recordings);
-  }, [recordings]);
 
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [startTimer, setStartTimer] = useState(false);
@@ -82,6 +71,8 @@ function App() {
           </a>
         </div>
       )}
+
+      <RecordingsList />
     </main>
   );
 }

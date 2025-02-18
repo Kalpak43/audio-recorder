@@ -8,7 +8,11 @@ import {
 export const fetchRecordings = createAsyncThunk(
   "recordings/fetch",
   async () => {
-    return await getRecordings();
+    let recordings = await getRecordings();
+
+    return recordings.sort((a, b) => {
+      return b.timestamp - a.timestamp;
+    });
   }
 );
 
