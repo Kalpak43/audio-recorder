@@ -33,6 +33,8 @@ const recordingSlice = createSlice({
         addRecording.fulfilled,
         (state, action: PayloadAction<RecordingWithId>) => {
           state.list.push(action.payload);
+          let recordings: any[] = state.list;
+          state.list = recordings.sort((a, b) => b.timestamp - a.timestamp);
         }
       )
       .addCase(

@@ -4,6 +4,7 @@ import { Mic } from "lucide-react";
 import { useAppDispatch } from "../app/hook";
 import { addRecording } from "../features/recording/recordingThunk";
 import AudioPlayer from "./AudioPlayer";
+import { useMessenger } from "../useMessenger";
 
 function RecorderComponent() {
   const dispatch = useAppDispatch();
@@ -13,6 +14,8 @@ function RecorderComponent() {
   const [name, setName] = useState<string>("");
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [duration, setDuration] = useState<number>(0);
+
+  const { showMessage } = useMessenger();
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -52,6 +55,8 @@ function RecorderComponent() {
           duration: duration,
         })
       );
+    showMessage("Saved to your recordings.", "success");
+    handleDiscard();
   }
 
   const handleDiscard = () => {
@@ -71,37 +76,7 @@ function RecorderComponent() {
 
   return (
     <div className="space-y-4 ">
-      {!hide && (
-        <h1 className="text-5xl font-bold mb-8 text-[#30cfd0]">
-          Start Recording
-        </h1>
-      )}
-      <p className="text-white font-bold text-3xl">
-        {startTimer ? formatTime(elapsedTime) : "00:00"}
-      </p>
-
-      <AudioRecorder
-        onStart={() => {
-          setStartTimer(true);
-          setHide(true);
-        }}
-        onStop={handleStopRecording}
-        className={`background p-2 text-white overflow-hidden rounded-full p-4 h-30 aspect-square flex items-center justify-center shadow-md flex items-center mx-auto relative ${
-          startTimer ? "background-2" : "background"
-        }`}
-        visualizer={canvasRef}
-      >
-        <Mic
-          className={`${startTimer ? "text-red-500 " : "text-white"}`}
-          size={32}
-        />
-        <canvas
-          ref={canvasRef}
-          className="inset-0 h-full w-full mb-4 mx-auto absolute"
-        />
-      </AudioRecorder>
-
-      {recordedBlob && (
+      {recordedBlob ? (
         <AudioPlayer
           recording={{
             id: -12,
@@ -115,6 +90,37 @@ function RecorderComponent() {
           handleSave={handleSave}
           handleDiscard={handleDiscard}
         />
+      ) : (
+        <>
+          {!hide && (
+            <h1 className="text-5xl font-bold mb-8 text-[#30cfd0]">
+              Start Recording
+            </h1>
+          )}
+          <p className="text-white font-bold text-3xl">
+            {startTimer ? formatTime(elapsedTime) : "00:00"}
+          </p>
+          <AudioRecorder
+            onStart={() => {
+              setStartTimer(true);
+              setHide(true);
+            }}
+            onStop={handleStopRecording}
+            className={`background p-2 text-white overflow-hidden rounded-full p-4 h-30 aspect-square flex items-center justify-center shadow-md flex items-center mx-auto relative ${
+              startTimer ? "background-2" : "background"
+            }`}
+            visualizer={canvasRef}
+          >
+            <Mic
+              className={`${startTimer ? "text-red-500 " : "text-white"}`}
+              size={32}
+            />
+            <canvas
+              ref={canvasRef}
+              className="inset-0 h-full w-full mb-4 mx-auto absolute"
+            />
+          </AudioRecorder>
+        </>
       )}
     </div>
   );
