@@ -4,6 +4,7 @@ import { useAppDispatch } from "../app/hook";
 import { removeRecording } from "../features/recording/recordingThunk";
 
 function AudioPlayer({ recording }: { recording: RecordingWithId }) {
+  console.log(recording);
   const dispatch = useAppDispatch();
   const [isConverting, setIsConverting] = useState(false);
   const url = URL.createObjectURL(recording.blob);

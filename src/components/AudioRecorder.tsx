@@ -1,11 +1,13 @@
 import { RefObject, useRef, useState } from "react";
 
 function AudioRecorder({
+  children,
   className,
   onStart,
   onStop,
   visualizer,
 }: {
+  children?: React.ReactNode;
   className?: string;
   onStart: () => void;
   onStop: (recordedBlob: { duration: number; audioBlob: Blob }) => void;
@@ -218,6 +220,7 @@ function AudioRecorder({
       className={`cursor-pointer ${className}`}
       onClick={isRecording ? stopRecording : startRecording}
     >
+      {children}
       {isRecording ? "Stop Recording" : "Start Recording"}
     </button>
   );

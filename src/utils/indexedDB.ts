@@ -22,6 +22,7 @@ export const saveRecording = async (data: RecordingType) => {
     name: data.name,
     blob: data.blob,
     timestamp: Date.now(),
+    duration: data.duration,
   });
   return id;
 };
