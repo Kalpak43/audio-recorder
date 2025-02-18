@@ -3,6 +3,7 @@ import {
   addRecording,
   fetchRecordings,
   removeRecording,
+  updateRecordingNameThunk,
 } from "./recordingThunk";
 
 interface RecordingState {
@@ -40,6 +41,17 @@ const recordingSlice = createSlice({
           state.list = state.list.filter(
             (rec: RecordingWithId) => rec.id !== action.payload
           );
+        }
+      )
+      .addCase(
+        updateRecordingNameThunk.fulfilled,
+        (state, action: PayloadAction<{ id: number; newName: string }>) => {
+          const recording = state.list.find(
+            (rec) => rec.id === action.payload.id
+          );
+          if (recording) {
+            recording.name = action.payload.newName;
+          }
         }
       );
   },

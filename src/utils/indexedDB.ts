@@ -36,3 +36,18 @@ export const deleteRecording = async (id: number) => {
   const db = await initDB();
   await db.delete(STORE_NAME, id);
 };
+
+export const updateRecordingName = async (id: number, newName: string) => {
+  const db = await initDB();
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  const store = tx.objectStore(STORE_NAME);
+
+  const recording = await store.get(id);
+  if (!recording) {
+    throw new Error("Recording not found");
+  }
+
+  recording.name = newName;
+  await store.put(recording);
+  await tx.done;
+};

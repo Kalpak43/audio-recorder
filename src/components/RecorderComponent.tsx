@@ -3,6 +3,7 @@ import AudioRecorder from "./AudioRecorder";
 import { Circle, Mic } from "lucide-react";
 import { useAppDispatch } from "../app/hook";
 import { addRecording } from "../features/recording/recordingThunk";
+import AudioPlayer from "./AudioPlayer";
 
 function RecorderComponent() {
   const dispatch = useAppDispatch();
@@ -10,6 +11,7 @@ function RecorderComponent() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [startTimer, setStartTimer] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [name, setName] = useState<string>("");
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [duration, setDuration] = useState<number>(0);
 
@@ -40,6 +42,7 @@ function RecorderComponent() {
     duration: number;
     audioBlob: Blob;
   }) {
+    setName("REC: " + new Date().toLocaleString());
     setRecordedBlob(recordedData.audioBlob);
     setDuration(recordedData.duration);
     setStartTimer(false);
@@ -82,18 +85,29 @@ function RecorderComponent() {
         />
       </AudioRecorder>
 
-      {audioUrl && (
-        <div className="mt-4">
-          <audio controls src={audioUrl} className="mx-auto" />
-          <a
-            href={audioUrl}
-            download="recording.wav"
-            className="block mt-2 text-blue-500"
-          >
-            Download Recording
-          </a>
-        </div>
+      {recordedBlob && (
+        <AudioPlayer
+          recording={{
+            id: -12,
+            name: name,
+            blob: recordedBlob,
+            duration: duration,
+            timestamp: new Date(),
+          }}
+          editable={true}
+          onNameEdit={(name: string) => setName(name)}
+          handleSave={() => {
+            dispatch(
+              addRecording({
+                name: name,
+                blob: recordedBlob,
+                duration: duration,
+              })
+            );
+          }}
+        />
       )}
+
       {recordedBlob && <button onClick={handleSave}>Save Audio</button>}
     </div>
   );

@@ -1,10 +1,31 @@
 import { useState, useRef, useEffect } from "react";
 import { convertToMp3 } from "../utils/audio";
 import { useAppDispatch } from "../app/hook";
-import { removeRecording } from "../features/recording/recordingThunk";
-import { Download, Loader2, Pause, Play, Trash2 } from "lucide-react";
+import {
+  removeRecording,
+  updateRecordingNameThunk,
+} from "../features/recording/recordingThunk";
+import {
+  Download,
+  Loader2,
+  Pause,
+  Pen,
+  Play,
+  Save,
+  Trash2,
+} from "lucide-react";
 
-function AudioPlayer({ recording }: { recording: RecordingWithId }) {
+function AudioPlayer({
+  recording,
+  editable = false,
+  onNameEdit,
+  handleSave,
+}: {
+  recording: RecordingWithId;
+  editable: boolean;
+  onNameEdit?: (name: string) => void;
+  handleSave?: () => void;
+}) {
   const dispatch = useAppDispatch();
   const [isConverting, setIsConverting] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -12,6 +33,32 @@ function AudioPlayer({ recording }: { recording: RecordingWithId }) {
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [url, setUrl] = useState<string>("");
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(recording.name);
+
+  const handleNameSubmit = async () => {
+    if (editedName.trim() !== recording.name) {
+      editable && onNameEdit
+        ? onNameEdit(editedName)
+        : await dispatch(
+            updateRecordingNameThunk({
+              id: recording.id,
+              newName: editedName.trim(),
+            })
+          );
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleNameSubmit();
+    } else if (e.key === "Escape") {
+      setEditedName(recording.name);
+      setIsEditing(false);
+    }
+  };
 
   useEffect(() => {
     // Generate URL when component mounts
@@ -95,7 +142,27 @@ function AudioPlayer({ recording }: { recording: RecordingWithId }) {
     <div className="flex flex-col gap-4 p-4 border border-blue-300 rounded-md  w-full sm:min-w-sm">
       <div className="flex items-center justify-between gap-4 ">
         <div className="space-y-2 flex-1">
-          <p className="text-left font-semibold">{recording.name}</p>
+          <div className="flex gap-2 items-center">
+            {isEditing ? (
+              <input
+                type="text"
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                onBlur={handleNameSubmit}
+                onKeyDown={handleKeyDown}
+                className="text-left font-semibold border rounded px-1 py-0.5 focus:outline-none focus:border-blue-500"
+                autoFocus
+              />
+            ) : (
+              <p className="text-left font-semibold">{recording.name}</p>
+            )}
+            <button
+              className="cursor-pointer hover:text-blue-600"
+              onClick={() => setIsEditing(true)}
+            >
+              <Pen size={12} className="inline" />
+            </button>
+          </div>
           <div className="flex items-center gap-2">
             <input
               type="range"
@@ -120,7 +187,7 @@ function AudioPlayer({ recording }: { recording: RecordingWithId }) {
         <div>
           <button
             onClick={handlePlayPause}
-            className="p-4 flex-1 background text-white bg-blue-500 rounded-full hover:bg-blue-600 transition"
+            className="p-4 flex-1 background text-white bg-blue-500 rounded-full hover:bg-blue-600 transition cursor-pointer"
           >
             {isPlaying ? <Pause /> : <Play />}
           </button>
@@ -131,14 +198,17 @@ function AudioPlayer({ recording }: { recording: RecordingWithId }) {
       <audio ref={audioRef} src={url} preload="metadata" />
 
       {/* Download Buttons */}
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <p className="text-xs text-gray-500">
           {recording.timestamp
             ? new Date(recording.timestamp).toLocaleString()
             : ""}
         </p>
-        <div className="flex justify-end gap-4">
-          <button onClick={handleDownloadMp3} className="text-blue-500">
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={handleDownloadMp3}
+            className="text-blue-500 cursor-pointer hover:bg-gray-800 hover:text-blue-700 p-2 rounded-full"
+          >
             {isConverting ? (
               <Loader2 className="animate-spin" size={20} />
             ) : (
@@ -146,12 +216,21 @@ function AudioPlayer({ recording }: { recording: RecordingWithId }) {
             )}
           </button>
 
-          <button
-            onClick={() => dispatch(removeRecording(recording.id))}
-            className="text-red-500"
-          >
-            <Trash2 size={20} />
-          </button>
+          {editable ? (
+            <button
+              onClick={handleSave}
+              className="text-green-500 cursor-pointer hover:bg-gray-800 hover:text-green-700 p-2 rounded-full"
+            >
+              <Save size={20} />
+            </button>
+          ) : (
+            <button
+              onClick={() => dispatch(removeRecording(recording.id))}
+              className="text-red-500 cursor-pointer hover:bg-gray-800 hover:text-red-700 p-2 rounded-full"
+            >
+              <Trash2 size={20} />
+            </button>
+          )}
         </div>
       </div>
     </div>

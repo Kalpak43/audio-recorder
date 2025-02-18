@@ -3,6 +3,7 @@ import {
   deleteRecording,
   getRecordings,
   saveRecording,
+  updateRecordingName,
 } from "../../utils/indexedDB";
 
 export const fetchRecordings = createAsyncThunk(
@@ -49,5 +50,13 @@ export const removeRecording = createAsyncThunk(
   async (id: number) => {
     await deleteRecording(id);
     return id;
+  }
+);
+
+export const updateRecordingNameThunk = createAsyncThunk(
+  "recordings/updateName",
+  async ({ id, newName }: { id: number; newName: string }) => {
+    await updateRecordingName(id, newName);
+    return { id, newName };
   }
 );
