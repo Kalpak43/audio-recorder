@@ -40,7 +40,11 @@ function RecordingsList() {
           </button>
         </div>
         {recordings.map((recording) => (
-          <AudioPlayer key={recording.id} recording={recording} />
+          <AudioPlayer
+            editable={false}
+            key={recording.id}
+            recording={recording}
+          />
         ))}
       </div>
     </>

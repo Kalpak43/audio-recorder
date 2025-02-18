@@ -118,8 +118,8 @@ function AudioRecorder({
       analyser && analyser.current!.getByteTimeDomainData(dataArrayRef.current);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#f00";
       ctx.beginPath();
 
       const sliceWidth = canvas.width / dataArrayRef.current.length;

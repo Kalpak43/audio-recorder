@@ -1,6 +1,21 @@
 .background {
   background-image: linear-gradient(to top, rgb(48, 207, 208) 0%, #330867 100%);
 }
+.background-2 {
+  background-image: linear-gradient(
+    to bottom,
+    #ff8177 0%,
+    #f8857b 0%,
+    #fc7c6e 21%,
+    #f46f60 52%,
+    #cf556c 78%,
+    #b12a5b 100%
+  );
+}
+
+.background-3 {
+  background: linear-gradient(to right, #000428, #004e92);
+}
 
 .shadow-white {
   box-shadow: -2px -2px 8px rgba(255, 255, 255, 0.389);

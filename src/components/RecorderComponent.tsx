@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import AudioRecorder from "./AudioRecorder";
-import { Circle, Mic } from "lucide-react";
+import { Mic } from "lucide-react";
 import { useAppDispatch } from "../app/hook";
 import { addRecording } from "../features/recording/recordingThunk";
 import AudioPlayer from "./AudioPlayer";
 
 function RecorderComponent() {
   const dispatch = useAppDispatch();
-
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [hide, setHide] = useState(false);
   const [startTimer, setStartTimer] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [name, setName] = useState<string>("");
@@ -34,10 +33,6 @@ function RecorderComponent() {
     };
   }, [startTimer]);
 
-  useEffect(() => {
-    recordedBlob && setAudioUrl(URL.createObjectURL(recordedBlob));
-  }, [recordedBlob]);
-
   function handleStopRecording(recordedData: {
     duration: number;
     audioBlob: Blob;
@@ -52,36 +47,57 @@ function RecorderComponent() {
     if (recordedBlob)
       dispatch(
         addRecording({
+          name: name,
           blob: recordedBlob,
           duration: duration,
         })
       );
   }
 
+  const handleDiscard = () => {
+    setRecordedBlob(null);
+    setName("");
+    setDuration(0);
+    setHide(false);
+  };
+
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   return (
     <div className="space-y-4 ">
+      {!hide && (
+        <h1 className="text-5xl font-bold mb-8 text-[#30cfd0]">
+          Start Recording
+        </h1>
+      )}
       <p className="text-white font-bold text-3xl">
-        {startTimer ? elapsedTime : "00:00"}
+        {startTimer ? formatTime(elapsedTime) : "00:00"}
       </p>
-      <canvas
-        ref={canvasRef}
-        width={300}
-        height={100}
-        className=" h-auto mb-4 border-2 border-gray-300 mx-auto"
-      />
+
       <AudioRecorder
         onStart={() => {
           setStartTimer(true);
+          setHide(true);
         }}
         onStop={handleStopRecording}
-        className={`p-2 text-white rounded-full p-4 shadow-md flex items-center mx-auto ${
-          startTimer ? "bg-red-500 " : "bg-blue-400"
+        className={`background p-2 text-white overflow-hidden rounded-full p-4 h-30 aspect-square flex items-center justify-center shadow-md flex items-center mx-auto relative ${
+          startTimer ? "background-2" : "background"
         }`}
         visualizer={canvasRef}
       >
         <Mic
           className={`${startTimer ? "text-red-500 " : "text-white"}`}
           size={32}
+        />
+        <canvas
+          ref={canvasRef}
+          className="inset-0 h-full w-full mb-4 mx-auto absolute"
         />
       </AudioRecorder>
 
@@ -96,19 +112,10 @@ function RecorderComponent() {
           }}
           editable={true}
           onNameEdit={(name: string) => setName(name)}
-          handleSave={() => {
-            dispatch(
-              addRecording({
-                name: name,
-                blob: recordedBlob,
-                duration: duration,
-              })
-            );
-          }}
+          handleSave={handleSave}
+          handleDiscard={handleDiscard}
         />
       )}
-
-      {recordedBlob && <button onClick={handleSave}>Save Audio</button>}
     </div>
   );
 }

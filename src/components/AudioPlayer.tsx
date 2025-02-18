@@ -20,11 +20,13 @@ function AudioPlayer({
   editable = false,
   onNameEdit,
   handleSave,
+  handleDiscard,
 }: {
   recording: RecordingWithId;
   editable: boolean;
   onNameEdit?: (name: string) => void;
   handleSave?: () => void;
+  handleDiscard?: () => void;
 }) {
   const dispatch = useAppDispatch();
   const [isConverting, setIsConverting] = useState(false);
@@ -215,22 +217,24 @@ function AudioPlayer({
               <Download size={20} />
             )}
           </button>
-
-          {editable ? (
+          {editable && (
             <button
               onClick={handleSave}
               className="text-green-500 cursor-pointer hover:bg-gray-800 hover:text-green-700 p-2 rounded-full"
             >
               <Save size={20} />
             </button>
-          ) : (
-            <button
-              onClick={() => dispatch(removeRecording(recording.id))}
-              className="text-red-500 cursor-pointer hover:bg-gray-800 hover:text-red-700 p-2 rounded-full"
-            >
-              <Trash2 size={20} />
-            </button>
           )}
+          <button
+            onClick={() => {
+              editable && handleDiscard
+                ? handleDiscard()
+                : dispatch(removeRecording(recording.id));
+            }}
+            className="text-red-500 cursor-pointer hover:bg-gray-800 hover:text-red-700 p-2 rounded-full"
+          >
+            <Trash2 size={20} />
+          </button>
         </div>
       </div>
     </div>
