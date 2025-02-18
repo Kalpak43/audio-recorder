@@ -26,7 +26,7 @@ function MessagePanel() {
           animate={{ opacity: 1, y: 0 }} // Fade in
           exit={{ opacity: 0, y: 50 }} // Fade out and slide down
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className={`fixed bottom-0 max-md:left-0 right-0 m-2 z-50 p-4 min-w-xs w-fit rounded-lg border ${getMessageStyle()} shadow-lg max-md:mx-auto`}
+          className={`fixed bottom-0 max-md:left-0 right-0 m-4 z-50 p-4 min-w-xs w-fit rounded-lg border ${getMessageStyle()} shadow-lg max-md:mx-auto`}
         >
           <div className="flex items-center space-x-2">
             {messageDetails.type === "success" && <FiCheckCircle />}

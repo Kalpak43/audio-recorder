@@ -1,4 +1,5 @@
 import { RefObject, useRef, useState } from "react";
+import { useMessenger } from "../useMessenger";
 
 function AudioRecorder({
   children,
@@ -20,9 +21,23 @@ function AudioRecorder({
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const analyser = useRef<AnalyserNode | null>(null);
+  const { showMessage } = useMessenger();
 
   async function startRecording() {
     try {
+      // Check for microphone permissions
+      const permissions = await navigator.permissions.query({
+        name: "microphone" as PermissionName,
+      });
+
+      if (permissions.state === "denied") {
+        showMessage(
+          "Please enable mic in your browser settings.",
+          "error"
+        );
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       // Setup Web Audio API
@@ -45,8 +60,8 @@ function AudioRecorder({
       mediaRecorderRef.current = new MediaRecorder(stream);
       onStart();
 
-      let startTime: number; // Track the start time of the recording
-      let duration; // Track the duration of the recording
+      let startTime: number;
+      let duration;
 
       mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -55,11 +70,11 @@ function AudioRecorder({
       };
 
       mediaRecorderRef.current.onstart = () => {
-        startTime = Date.now(); // Record the start time
+        startTime = Date.now();
       };
 
       mediaRecorderRef.current.onstop = async () => {
-        duration = Date.now() - startTime; // Calculate duration in seconds
+        duration = Date.now() - startTime;
 
         if (audioContextRef.current) {
           audioContextRef.current.close();
@@ -70,19 +85,20 @@ function AudioRecorder({
         });
 
         // Create a metadata object that includes the duration
-        const metadata = {
-          duration: duration,
-          audioBlob: audioBlob,
-        };
+        const metadata = { duration, audioBlob };
 
-        onStop(metadata); // Pass the metadata Blob to the onStop function
-        audioChunksRef.current = []; // Clear chunks
+        onStop(metadata);
+        audioChunksRef.current = [];
       };
 
       mediaRecorderRef.current.start();
       setIsRecording(true);
     } catch (e) {
-      console.error("Some error occurred: ", e);
+      console.error("Error accessing microphone: ", e);
+      showMessage(
+        "Please check your mic permissions.",
+        "error"
+      );
     }
   }
 
@@ -147,73 +163,73 @@ function AudioRecorder({
     draw();
   }
 
-  const drawCircularWaveform = () => {
-    if (
-      (visualizer && !visualizer.current) ||
-      (analyser && !analyser.current) ||
-      !dataArrayRef.current
-    ) {
-      return;
-    }
+  // const drawCircularWaveform = () => {
+  //   if (
+  //     (visualizer && !visualizer.current) ||
+  //     (analyser && !analyser.current) ||
+  //     !dataArrayRef.current
+  //   ) {
+  //     return;
+  //   }
 
-    const canvas = visualizer!.current!;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  //   const canvas = visualizer!.current!;
+  //   const ctx = canvas.getContext("2d");
+  //   if (!ctx) return;
 
-    const draw = () => {
-      if ((analyser && !analyser.current) || !dataArrayRef.current) return;
+  //   const draw = () => {
+  //     if ((analyser && !analyser.current) || !dataArrayRef.current) return;
 
-      analyser && analyser!.current!.getByteFrequencyData(dataArrayRef.current);
+  //     analyser && analyser!.current!.getByteFrequencyData(dataArrayRef.current);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  //     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const radius = Math.min(centerX, centerY) - 10;
+  //     const centerX = canvas.width / 2;
+  //     const centerY = canvas.height / 2;
+  //     const radius = Math.min(centerX, centerY) - 10;
 
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
-      ctx.stroke();
+  //     ctx.beginPath();
+  //     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+  //     ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
+  //     ctx.stroke();
 
-      for (let i = 0; i < dataArrayRef.current.length; i++) {
-        const angle = (i / dataArrayRef.current.length) * 2 * Math.PI;
-        const amplitude = dataArrayRef.current[i] / 255;
-        const x = centerX + radius * Math.cos(angle) * (1 + amplitude * 0.3);
-        const y = centerY + radius * Math.sin(angle) * (1 + amplitude * 0.3);
+  //     for (let i = 0; i < dataArrayRef.current.length; i++) {
+  //       const angle = (i / dataArrayRef.current.length) * 2 * Math.PI;
+  //       const amplitude = dataArrayRef.current[i] / 255;
+  //       const x = centerX + radius * Math.cos(angle) * (1 + amplitude * 0.3);
+  //       const y = centerY + radius * Math.sin(angle) * (1 + amplitude * 0.3);
 
-        ctx.beginPath();
-        ctx.arc(x, y, 2 + amplitude * 5, 0, 2 * Math.PI);
-        ctx.fillStyle = `hsl(${
-          (i * 360) / dataArrayRef.current.length
-        }, 100%, 50%)`;
-        ctx.fill();
+  //       ctx.beginPath();
+  //       ctx.arc(x, y, 2 + amplitude * 5, 0, 2 * Math.PI);
+  //       ctx.fillStyle = `hsl(${
+  //         (i * 360) / dataArrayRef.current.length
+  //       }, 100%, 50%)`;
+  //       ctx.fill();
 
-        if (i > 0) {
-          const prevAngle =
-            ((i - 1) / dataArrayRef.current.length) * 2 * Math.PI;
-          const prevAmplitude = dataArrayRef.current[i - 1] / 255;
-          const prevX =
-            centerX + radius * Math.cos(prevAngle) * (1 + prevAmplitude * 0.3);
-          const prevY =
-            centerY + radius * Math.sin(prevAngle) * (1 + prevAmplitude * 0.3);
+  //       if (i > 0) {
+  //         const prevAngle =
+  //           ((i - 1) / dataArrayRef.current.length) * 2 * Math.PI;
+  //         const prevAmplitude = dataArrayRef.current[i - 1] / 255;
+  //         const prevX =
+  //           centerX + radius * Math.cos(prevAngle) * (1 + prevAmplitude * 0.3);
+  //         const prevY =
+  //           centerY + radius * Math.sin(prevAngle) * (1 + prevAmplitude * 0.3);
 
-          ctx.beginPath();
-          ctx.moveTo(prevX, prevY);
-          ctx.lineTo(x, y);
-          ctx.strokeStyle = `hsla(${
-            (i * 360) / dataArrayRef.current.length
-          }, 100%, 50%, 0.5)`;
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-      }
+  //         ctx.beginPath();
+  //         ctx.moveTo(prevX, prevY);
+  //         ctx.lineTo(x, y);
+  //         ctx.strokeStyle = `hsla(${
+  //           (i * 360) / dataArrayRef.current.length
+  //         }, 100%, 50%, 0.5)`;
+  //         ctx.lineWidth = 2;
+  //         ctx.stroke();
+  //       }
+  //     }
 
-      animationFrameRef.current = requestAnimationFrame(draw);
-    };
+  //     animationFrameRef.current = requestAnimationFrame(draw);
+  //   };
 
-    draw();
-  };
+  //   draw();
+  // };
 
   return (
     <button

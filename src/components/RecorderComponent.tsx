@@ -21,6 +21,7 @@ function RecorderComponent() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    // @ts-ignore
     let interval: NodeJS.Timeout | null = null;
 
     if (startTimer) {

@@ -1,5 +1,3 @@
-import React from "react";
-
 function WaveBackground() {
   return (
     <div className="ondebox fixed  inset-x-0 bottom-0">
