@@ -36,9 +36,17 @@ function App() {
     recordedBlob && setAudioUrl(URL.createObjectURL(recordedBlob));
   }, [recordedBlob]);
 
-  function handleStopRecording(recordedBlob: Blob) {
-    setRecordedBlob(recordedBlob);
-    dispatch(addRecording({ blob: recordedBlob }));
+  function handleStopRecording(recordedData: {
+    duration: number;
+    audioBlob: Blob;
+  }) {
+    setRecordedBlob(recordedData.audioBlob);
+    dispatch(
+      addRecording({
+        blob: recordedData.audioBlob,
+        duration: recordedData.duration,
+      })
+    );
     setStartTimer(false);
   }
 

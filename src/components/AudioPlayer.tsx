@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { Mp3Encoder } from "@breezystack/lamejs";
+import { useRef, useState } from "react";
 import { convertToMp3 } from "../utils/audio";
+import { useAppDispatch } from "../app/hook";
+import { removeRecording } from "../features/recording/recordingThunk";
 
 function AudioPlayer({ recording }: { recording: RecordingWithId }) {
+  const dispatch = useAppDispatch();
   const [isConverting, setIsConverting] = useState(false);
   const url = URL.createObjectURL(recording.blob);
 
@@ -24,7 +26,8 @@ function AudioPlayer({ recording }: { recording: RecordingWithId }) {
   return (
     <div className="">
       <p>{recording.name}</p>
-      <audio controls preload="metadata">
+      <p className="font-bold">{recording.duration}</p>
+      <audio controls preload="metadata" className="mx-auto">
         <source src={url} />
       </audio>
       <a
@@ -37,6 +40,14 @@ function AudioPlayer({ recording }: { recording: RecordingWithId }) {
 
       <button onClick={handleDownloadMp3} className="mt-2 text-blue-500">
         {isConverting ? "Converting..." : "Download MP3"}
+      </button>
+
+      <button
+        onClick={() => {
+          dispatch(removeRecording(recording.id));
+        }}
+      >
+        Delete
       </button>
     </div>
   );

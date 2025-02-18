@@ -8,7 +8,7 @@ function AudioRecorder({
 }: {
   className?: string;
   onStart: () => void;
-  onStop: (recordedBlob: Blob) => void;
+  onStop: (recordedBlob: { duration: number; audioBlob: Blob }) => void;
   visualizer?: RefObject<HTMLCanvasElement | null>;
 }) {
   const [isRecording, setIsRecording] = useState(false);
@@ -39,11 +39,12 @@ function AudioRecorder({
         drawWaveform();
       }
 
-      // Start drawing waveform
-
       // Start MediaRecorder
       mediaRecorderRef.current = new MediaRecorder(stream);
       onStart();
+
+      let startTime: number; // Track the start time of the recording
+      let duration; // Track the duration of the recording
 
       mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -51,7 +52,13 @@ function AudioRecorder({
         }
       };
 
+      mediaRecorderRef.current.onstart = () => {
+        startTime = Date.now(); // Record the start time
+      };
+
       mediaRecorderRef.current.onstop = async () => {
+        duration = Date.now() - startTime; // Calculate duration in seconds
+
         if (audioContextRef.current) {
           audioContextRef.current.close();
         }
@@ -60,7 +67,13 @@ function AudioRecorder({
           type: "audio/wav",
         });
 
-        onStop(audioBlob);
+        // Create a metadata object that includes the duration
+        const metadata = {
+          duration: duration,
+          audioBlob: audioBlob,
+        };
+
+        onStop(metadata); // Pass the metadata Blob to the onStop function
         audioChunksRef.current = []; // Clear chunks
       };
 

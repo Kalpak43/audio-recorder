@@ -18,14 +18,27 @@ export const fetchRecordings = createAsyncThunk(
 
 export const addRecording = createAsyncThunk(
   "recordings/add",
-  async ({ name, blob }: { name?: string; blob: Blob }) => {
+  async ({
+    name,
+    blob,
+    duration,
+  }: {
+    name?: string;
+    blob: Blob;
+    duration: number;
+  }) => {
     const recordingName = name ?? new Date().toLocaleString();
-    const id = await saveRecording({ name: recordingName, blob: blob });
+    const id = await saveRecording({
+      name: recordingName,
+      blob: blob,
+      duration: duration,
+    });
     return {
       id,
       name: recordingName,
       blob,
       timestamp: Date.now(),
+      duration: duration,
     } as RecordingWithId;
   }
 );
