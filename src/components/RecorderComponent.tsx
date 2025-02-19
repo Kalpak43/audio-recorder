@@ -80,8 +80,8 @@ function RecorderComponent() {
 
   return (
     <div className="space-y-4 ">
-      {recordedBlob ? (
-        <AnimatePresence mode="wait">
+      <AnimatePresence>
+        {recordedBlob ? (
           <motion.div
             key="recorded"
             initial={{ opacity: 0 }}
@@ -102,17 +102,20 @@ function RecorderComponent() {
               handleDiscard={handleDiscard}
             />
           </motion.div>
-        </AnimatePresence>
-      ) : (
-        <AnimatePresence>
+        ) : (
           <motion.div
             key="recording"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            
           >
             {!hide && (
-              <h1 className={`text-5xl font-bold mb-8 ${theme == "dark" ? "text-[#30cfd0]" : "text-[#330867]"}`}>
+              <h1
+                className={`text-5xl font-bold mb-8 ${
+                  theme == "dark" ? "text-[#30cfd0]" : "text-[#330867]"
+                }`}
+              >
                 Start Recording
               </h1>
             )}
@@ -144,8 +147,8 @@ function RecorderComponent() {
               />
             </AudioRecorder>
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }
