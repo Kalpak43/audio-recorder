@@ -108,7 +108,6 @@ function RecorderComponent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            
           >
             {!hide && (
               <h1
@@ -126,26 +125,31 @@ function RecorderComponent() {
             >
               {startTimer ? formatTime(elapsedTime) : "00:00"}
             </p>
-            <AudioRecorder
-              onStart={() => {
-                setStartTimer(true);
-                setHide(true);
-              }}
-              onStop={handleStopRecording}
-              className={`background p-2 text-white overflow-hidden rounded-full p-4 h-30 aspect-square flex items-center justify-center shadow-md flex items-center mx-auto relative ${
-                startTimer ? "background-2" : "background"
-              }`}
-              visualizer={canvasRef}
-            >
-              <Mic
-                className={`${startTimer ? "text-red-500 " : "text-white"}`}
-                size={32}
-              />
-              <canvas
-                ref={canvasRef}
-                className="inset-0 h-full w-full mb-4 mx-auto absolute"
-              />
-            </AudioRecorder>
+            <div className="relative group">
+              <AudioRecorder
+                onStart={() => {
+                  setStartTimer(true);
+                  setHide(true);
+                }}
+                onStop={handleStopRecording}
+                className={`background p-2 text-white overflow-hidden rounded-full p-4 h-30 aspect-square flex items-center justify-center shadow-md flex items-center mx-auto relative ${
+                  startTimer ? "background-2" : "background"
+                }`}
+                visualizer={canvasRef}
+              >
+                <Mic
+                  className={`${startTimer ? "text-red-500 " : "text-white"}`}
+                  size={32}
+                />
+                <canvas
+                  ref={canvasRef}
+                  className="inset-0 h-full w-full mb-4 mx-auto absolute"
+                />
+              </AudioRecorder>
+              <span className="absolute left-1/2 -translate-x-1/2 top-full mb-1 opacity-0 group-hover:opacity-100 transition bg-gray-800 text-white text-xs rounded px-2 py-1">
+                {startTimer ? "Stop Recording" : "Start Recording"}
+              </span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

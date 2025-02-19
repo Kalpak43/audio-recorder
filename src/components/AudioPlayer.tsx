@@ -143,7 +143,11 @@ function AudioPlayer({
   };
 
   return (
-    <div className={`flex flex-col gap-4 p-4 border border-blue-300 rounded-md  w-full sm:min-w-sm ${theme == "light" && "shadow-md bg-gray-100"}`}>
+    <div
+      className={`flex flex-col gap-4 p-4 border border-blue-300 rounded-md  w-full sm:min-w-sm ${
+        theme == "light" && "shadow-md bg-gray-100"
+      }`}
+    >
       <div className="flex items-center justify-between gap-4 ">
         <div className="space-y-2 flex-1">
           <div className="flex gap-2 items-center">
@@ -160,12 +164,17 @@ function AudioPlayer({
             ) : (
               <p className="text-left font-semibold">{recording.name}</p>
             )}
-            <button
-              className="cursor-pointer hover:text-blue-600"
-              onClick={() => setIsEditing(true)}
-            >
-              <Pen size={12} className="inline" />
-            </button>
+            <div className="relative group">
+              <button
+                className="cursor-pointer hover:text-blue-600"
+                onClick={() => setIsEditing(true)}
+              >
+                <Pen size={12} className="inline" />
+              </button>
+              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition bg-gray-800 text-white text-xs rounded px-2 py-1">
+                Edit
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <input
@@ -189,12 +198,17 @@ function AudioPlayer({
         </div>
 
         <div>
-          <button
-            onClick={handlePlayPause}
-            className="p-4 flex-1 background text-white bg-blue-500 rounded-full hover:bg-blue-600 transition cursor-pointer"
-          >
-            {isPlaying ? <Pause /> : <Play />}
-          </button>
+          <div className="relative group">
+            <button
+              onClick={handlePlayPause}
+              className="p-4 flex-1 background text-white bg-blue-500 rounded-full hover:bg-blue-600 transition cursor-pointer"
+            >
+              {isPlaying ? <Pause /> : <Play />}
+            </button>
+            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition bg-gray-800 text-white text-xs rounded px-2 py-1">
+              {isPlaying ? "Pause" : "Play"}
+            </span>
+          </div>
         </div>
       </div>
       {/* Custom Play/Pause Button */}
@@ -209,40 +223,56 @@ function AudioPlayer({
             : ""}
         </p>
         <div className="flex justify-end gap-2">
-          <button
-            onClick={handleDownloadMp3}
-            className={`text-blue-500 cursor-pointer hover:text-blue-700  p-2 rounded-full ${
-              theme == "dark" ? " hover:bg-gray-800" : " hover:bg-gray-300"
-            }`}
-          >
-            {isConverting ? (
-              <Loader2 className="animate-spin" size={20} />
-            ) : (
-              <Download size={20} />
-            )}
-          </button>
-          {editable && (
+          <div className="relative group">
             <button
-              onClick={handleSave}
-              className={`text-green-500 cursor-pointer hover:text-green-700 p-2 rounded-full ${
+              onClick={handleDownloadMp3}
+              className={`text-blue-500 cursor-pointer hover:text-blue-700  p-2 rounded-full ${
                 theme == "dark" ? " hover:bg-gray-800" : " hover:bg-gray-300"
               }`}
             >
-              <Save size={20} />
+              {isConverting ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <Download size={20} />
+              )}
             </button>
+            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition bg-gray-800 text-white text-xs rounded px-2 py-1">
+              Download
+            </span>
+          </div>
+
+          {editable && (
+            <div className="relative group">
+              <button
+                onClick={handleSave}
+                className={`text-green-500 cursor-pointer hover:text-green-700 p-2 rounded-full ${
+                  theme == "dark" ? " hover:bg-gray-800" : " hover:bg-gray-300"
+                }`}
+              >
+                <Save size={20} />
+              </button>
+              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition bg-gray-800 text-white text-xs rounded px-2 py-1">
+                Save
+              </span>
+            </div>
           )}
-          <button
-            onClick={() => {
-              editable && handleDiscard
-                ? handleDiscard()
-                : dispatch(removeRecording(recording.id));
-            }}
-            className={`text-red-500 cursor-pointer hover:text-red-700 p-2 rounded-full ${
-              theme == "dark" ? " hover:bg-gray-800" : " hover:bg-gray-300"
-            }`}
-          >
-            <Trash2 size={20} />
-          </button>
+          <div className="relative group">
+            <button
+              onClick={() => {
+                editable && handleDiscard
+                  ? handleDiscard()
+                  : dispatch(removeRecording(recording.id));
+              }}
+              className={`text-red-500 cursor-pointer hover:text-red-700 p-2 rounded-full ${
+                theme == "dark" ? " hover:bg-gray-800" : " hover:bg-gray-300"
+              }`}
+            >
+              <Trash2 size={20} />
+            </button>
+            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition bg-gray-800 text-white text-xs rounded px-2 py-1">
+              Delete
+            </span>
+          </div>
         </div>
       </div>
     </div>
