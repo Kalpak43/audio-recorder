@@ -14,6 +14,7 @@ import {
   Save,
   Trash2,
 } from "lucide-react";
+import { useTheme } from "../context/ThemeProvider";
 
 function AudioPlayer({
   recording,
@@ -28,6 +29,7 @@ function AudioPlayer({
   handleSave?: () => void;
   handleDiscard?: () => void;
 }) {
+  const { theme } = useTheme();
   const dispatch = useAppDispatch();
   const [isConverting, setIsConverting] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -141,7 +143,7 @@ function AudioPlayer({
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 border border-blue-300 rounded-md  w-full sm:min-w-sm">
+    <div className={`flex flex-col gap-4 p-4 border border-blue-300 rounded-md  w-full sm:min-w-sm ${theme == "light" && "shadow-md bg-gray-100"}`}>
       <div className="flex items-center justify-between gap-4 ">
         <div className="space-y-2 flex-1">
           <div className="flex gap-2 items-center">
@@ -209,7 +211,9 @@ function AudioPlayer({
         <div className="flex justify-end gap-2">
           <button
             onClick={handleDownloadMp3}
-            className="text-blue-500 cursor-pointer hover:bg-gray-800 hover:text-blue-700 p-2 rounded-full"
+            className={`text-blue-500 cursor-pointer hover:text-blue-700  p-2 rounded-full ${
+              theme == "dark" ? " hover:bg-gray-800" : " hover:bg-gray-300"
+            }`}
           >
             {isConverting ? (
               <Loader2 className="animate-spin" size={20} />
@@ -220,7 +224,9 @@ function AudioPlayer({
           {editable && (
             <button
               onClick={handleSave}
-              className="text-green-500 cursor-pointer hover:bg-gray-800 hover:text-green-700 p-2 rounded-full"
+              className={`text-green-500 cursor-pointer hover:text-green-700 p-2 rounded-full ${
+                theme == "dark" ? " hover:bg-gray-800" : " hover:bg-gray-300"
+              }`}
             >
               <Save size={20} />
             </button>
@@ -231,7 +237,9 @@ function AudioPlayer({
                 ? handleDiscard()
                 : dispatch(removeRecording(recording.id));
             }}
-            className="text-red-500 cursor-pointer hover:bg-gray-800 hover:text-red-700 p-2 rounded-full"
+            className={`text-red-500 cursor-pointer hover:text-red-700 p-2 rounded-full ${
+              theme == "dark" ? " hover:bg-gray-800" : " hover:bg-gray-300"
+            }`}
           >
             <Trash2 size={20} />
           </button>

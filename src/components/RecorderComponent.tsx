@@ -6,8 +6,10 @@ import { addRecording } from "../features/recording/recordingThunk";
 import AudioPlayer from "./AudioPlayer";
 import { useMessenger } from "../useMessenger";
 import { motion, AnimatePresence } from "motion/react";
+import { useTheme } from "../context/ThemeProvider";
 
 function RecorderComponent() {
+  const { theme } = useTheme();
   const dispatch = useAppDispatch();
   const [hide, setHide] = useState(false);
   const [startTimer, setStartTimer] = useState(false);
@@ -110,11 +112,15 @@ function RecorderComponent() {
             exit={{ opacity: 0 }}
           >
             {!hide && (
-              <h1 className="text-5xl font-bold mb-8 text-[#30cfd0]">
+              <h1 className={`text-5xl font-bold mb-8 ${theme == "dark" ? "text-[#30cfd0]" : "text-[#330867]"}`}>
                 Start Recording
               </h1>
             )}
-            <p className="text-white font-bold text-3xl">
+            <p
+              className={`font-bold text-3xl ${
+                theme == "dark" ? "text-white" : "text-black"
+              }`}
+            >
               {startTimer ? formatTime(elapsedTime) : "00:00"}
             </p>
             <AudioRecorder

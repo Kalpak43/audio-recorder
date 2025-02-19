@@ -1,4 +1,8 @@
+import { useTheme } from "../context/ThemeProvider";
+
 function WaveBackground() {
+  const { theme } = useTheme();
+
   return (
     <div className="ondebox fixed  inset-x-0 bottom-0">
       <svg
@@ -19,7 +23,12 @@ function WaveBackground() {
           <use xlinkHref="#onda" x="48" y="0" fill="rgba(17, 170, 160, 0.38)" />
           <use xlinkHref="#onda" x="48" y="3" fill="rgba(17, 170, 160, 0.17)" />
           <use xlinkHref="#onda" x="48" y="5" fill="rgba(17,170,159,0.1)" />
-          <use xlinkHref="#onda" x="48" y="7" fill="rgb(144, 144, 144)" />
+          <use
+            xlinkHref="#onda"
+            x="48"
+            y="7"
+            fill={theme == "dark" ? "rgb(144, 144, 144)" : "rgb(3, 62, 77)"}
+          />
         </g>
       </svg>
     </div>

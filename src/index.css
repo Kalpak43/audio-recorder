@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+main {
+  transition: background 0.5s ease-in-out;
+}
+
+.light {
+  @apply bg-[#f3f3f3] text-black;
+}
+
+.dark {
+  @apply bg-[#030303] text-white;
+}
