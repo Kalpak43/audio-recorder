@@ -22,16 +22,29 @@ function RecordingsList() {
 
   return (
     <>
-      <button
-        className={`cursor-pointer z-50 fixed top-0 right-0 m-4 border-2 rounded-full p-4 ${
-          theme == "dark"
-            ? "hover:bg-white hover:text-black"
-            : "hover:bg-black hover:text-white"
+      <motion.button
+        className={`cursor-pointer z-50 fixed top-0 right-0 m-4 border-2 rounded-full p-4 transition-all duration-300 flex gap-2 justify-start items-center group ${
+          theme === "dark"
+            ? "bg-black hover:bg-white hover:text-black"
+            : "bg-white hover:bg-black hover:text-white"
         }`}
         onClick={() => setOpenList(true)}
+        initial={{ width: "3.5rem", height: "3.5rem" }}
+        whileHover={{ width: "13.5rem" }}
+        transition={{ duration: 0.1 }}
       >
-        <ListMusic />
-      </button>
+        <div className="-ml-[0.1rem]">
+          <ListMusic />
+        </div>
+        <motion.span
+          className="uppercase  overflow-hidden whitespace-nowrap"
+          initial={{ opacity: 0, width: 0 }}
+          animate={{ opacity: 1, width: "auto" }}
+          exit={{ opacity: 0, width: 0 }}
+        >
+          Your Recordings
+        </motion.span>
+      </motion.button>
       <div className="bg-[#00000080]"></div>
       <div
         className={`${
