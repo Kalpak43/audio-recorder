@@ -4,6 +4,7 @@ import { fetchRecordings } from "../features/recording/recordingThunk";
 import AudioPlayer from "./AudioPlayer";
 import { ListMusic, X } from "lucide-react";
 import { useTheme } from "../context/ThemeProvider";
+import { AnimatePresence, motion } from "motion/react";
 
 function RecordingsList() {
   const { theme } = useTheme();
@@ -37,7 +38,7 @@ function RecordingsList() {
           theme == "dark"
             ? "bg-black text-white shadow-white"
             : " bg-white text-black shadow-xl"
-        } bg-black z-50 space-y-2 fixed border-l border-blue-200 inset-y-0 py-4 px-4 w-fit right-0 overflow-y-auto transition-all duration-500 ${
+        } bg-black z-50 space-y-2 fixed border-l border-blue-200 inset-y-0 py-4 px-4 w-fit right-0 overflow-y-auto transition-all duration-500 overflow-x-hidden ${
           openList ? "translate-x-0" : "translate-x-[150%]"
         } ${theme == "dark" ? "" : ""}`}
       >
@@ -54,19 +55,30 @@ function RecordingsList() {
             <X />
           </button>
         </div>
-        {recordings.length > 0 ? (
-          recordings.map((recording) => (
-            <AudioPlayer
-              editable={false}
-              key={recording.id}
-              recording={recording}
-            />
-          ))
-        ) : (
-          <div className="h-[500px] flex items-center justify-center">
-            No Recordings Found
-          </div>
-        )}
+        <AnimatePresence>
+          {recordings.length > 0 ? (
+            recordings.map((recording) => (
+              <motion.div
+                layout
+                key={recording.id}
+                initial={{ opacity: 0, x: -100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 100 }}
+                transition={{ delay: 0.3 }}
+              >
+                <AudioPlayer
+                  editable={false}
+                  key={recording.id}
+                  recording={recording}
+                />
+              </motion.div>
+            ))
+          ) : (
+            <div className="h-[500px] flex items-center justify-center">
+              No Recordings Found
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );
